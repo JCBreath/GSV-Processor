@@ -16,9 +16,24 @@ python -m pip install tqdm numpy==1.24 pillow opencv-python
 ```
 
 ## Usage
-Run `python main.py {state_name} {start_group} {end_group (optional)} {county (optional)}`
+Run `python main.py --state {state_name} --building_detect --wallmat --condition --verbose`
 
-For example, `python main Indiana 0` will process all counties in Indiana.
+For example, `python main --state Indiana --building_detect --wallmat --condition --verbose` will process all counties in Indiana.
+
+Processing options:
+* `--state` - Set state
+* `--group_start` - Set starting group
+* `--group_end` - Set ending group (inclusive)
+* `--selected_county` - Set target county (will skip other counties)
+* `--section_start` - Set starting section in the `selected_county`
+* `--section_end` - Set ending section in the `selected_county`
+* `--verbose` - Show progress
+* `--skip` - Detect and skip processed sections
+
+Task options:
+* `--building_detect` - Detect and crop buildings
+* `--wallmat` - Classify wall material
+* `--condition` - Rate building condition
 
 ## Available Models
 - Building Detector: [checkpoint](https://drive.google.com/file/d/1e1KLGYoHGR989Eeeo_oQ863bD98oSojA/view?usp=sharing)
