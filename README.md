@@ -34,6 +34,8 @@ Task options:
 * `--building_detect` - Detect and crop buildings
 * `--wallmat` - Classify wall material
 * `--condition` - Rate building condition
+* `--nsi` - Build NSI JSON for the state
+* `--bev` - Build NSI+BEV JSON for the state
 
 ## Available Models
 - Building Detector: [checkpoint](https://drive.google.com/file/d/1e1KLGYoHGR989Eeeo_oQ863bD98oSojA/view?usp=sharing)
