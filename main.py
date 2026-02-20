@@ -31,6 +31,7 @@ if __name__ == "__main__":
     args.add_argument("--skip", action="store_true", help="Whether to skip already processed files")
 
     args.add_argument("--bev", action="store_true", help="Export BEV CSV files of this state.")
+    args.add_argument("--nsi", action="store_true", help="Export NSI JSON file of this state.")
 
     args = args.parse_args()
 
@@ -47,13 +48,19 @@ if __name__ == "__main__":
     verbose = args.verbose
     skip = args.skip
     bev = args.bev
+    nsi = args.nsi
 
-    if not bev:
+    if not bev and not nsi:
         processor = BuildingProcessor()
 
     gsv_dl_state_dir = f"{gsv_dl_dir}/{state}"
     gsv_proc_state_dir = f"{gsv_proc_dir}/{state}"
     os.makedirs(gsv_proc_state_dir, exist_ok=True)
+
+    if nsi:
+        from modules.bev import create_state_nsi
+        create_state_nsi(state, gsv_dl_dir, gsv_proc_dir, gsv_bev_dir)
+        exit()
 
     if bev:
         from modules.bev import create_state_bevs
