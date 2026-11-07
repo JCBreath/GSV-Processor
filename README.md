@@ -46,6 +46,10 @@ Task options:
   - Function: `BuildingProcessor.get_wallmat()`
     - Input: `PIL.Image`
     - Output: `int` (index of item in classes: `'brick', 'other', 'wood', 'wood & brick'`)
+- BLIP VQA Wall Material Classifier: [checkpoint](https://storage.googleapis.com/sfr-vision-language-research/BLIP/models/model_vqa.pth)
+  - Function: `BuildingProcessor.get_wallmat_vqa()`
+    - Input: `PIL.Image`
+    - Output: `dict` containing the predicted material, raw VQA answers, and wood/brick indicators
 - Building Condition Predictor: [checkpoint](https://drive.google.com/file/d/1EFM8vFHNTU1NMDyXl9HQQFZRMflmuhMq/view?usp=sharing)
   - Function: `BuildingProcessor.get_condition()`
     - Input: `PIL.Image`

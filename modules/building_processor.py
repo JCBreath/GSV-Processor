@@ -68,6 +68,10 @@ class BuildingProcessor:
         else:
             self.condition_model = None
 
+        self.wallmat_vqa_model = None
+        self.wallmat_vqa_vis_processors = None
+        self.wallmat_vqa_txt_processors = None
+
     def detect_and_crop(self, image: Image.Image):
         if self.building_detect_model is None:
             raise ValueError("Building detection model is not loaded.")
@@ -113,6 +117,69 @@ class BuildingProcessor:
         return {
             'material': self.wallmat_config["classes"][pred],
             'output': output.detach().cpu().numpy().tolist()
+        }
+
+    def get_wallmat_vqa(self, image: Image.Image):
+        if self.wallmat_vqa_model is None:
+            print("Loading BLIP VQA wall material model...")
+            try:
+                from lavis.models import load_model_and_preprocess
+            except ImportError as exc:
+                raise ImportError(
+                    "get_wallmat_vqa() requires the LAVIS package."
+                ) from exc
+
+            (
+                self.wallmat_vqa_model,
+                self.wallmat_vqa_vis_processors,
+                self.wallmat_vqa_txt_processors,
+            ) = load_model_and_preprocess(
+                name="blip_vqa",
+                model_type="vqav2",
+                is_eval=True,
+                device="cuda",
+            )
+
+        questions = {
+            "building_material": "What material is this building made of",
+            "is_wood_1": "Is this building made of wood",
+            "is_wood_2": "Is this wall made of wood",
+            "is_wood_3": "Does this building have any wood parts",
+            "is_brick_1": "Is this building made of brick",
+            "is_brick_2": "Is this wall made of brick",
+            "is_brick_3": "Does this building have any brick parts",
+            "is_brick_4": "Does this building have any masonry structure",
+        }
+
+        processed_image = self.wallmat_vqa_vis_processors["eval"](image).unsqueeze(0).to("cuda")
+        answers = {}
+        with torch.inference_mode():
+            for key, question in questions.items():
+                processed_question = self.wallmat_vqa_txt_processors["eval"](question)
+                answers[key] = self.wallmat_vqa_model.predict_answers(
+                    samples={
+                        "image": processed_image,
+                        "text_input": processed_question,
+                    },
+                    inference_method="generate",
+                )[0]
+
+        is_wood = any(answers[key] == "yes" for key in ("is_wood_1", "is_wood_2", "is_wood_3"))
+        is_brick = any(
+            answers[key] == "yes"
+            for key in ("is_brick_1", "is_brick_2", "is_brick_3", "is_brick_4")
+        )
+
+        if answers["building_material"] in ("brick", "wood"):
+            material = "wood & brick" if is_wood and is_brick else answers["building_material"]
+        else:
+            material = "other"
+
+        return {
+            "material": material,
+            "answers": answers,
+            "is_wood": is_wood,
+            "is_brick": is_brick,
         }
     
     def get_condition(self, image: Image.Image):
