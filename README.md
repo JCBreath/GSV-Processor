@@ -2,18 +2,22 @@
 The content in this repository only serves for researches in [BEDA Lab](https://bedalab.nd.edu/).
 
 ## Requirements
-This processor runs on **Linux** with **Python 3.10** and **PyTorch 1.13 + CUDA 11.6**
+This processor runs on **Linux** with **Python 3.8** and **PyTorch 1.13 + CUDA 11.6**.
+Python 3.8 is required for compatibility with the dependencies pinned by LAVIS 1.0.2.
 
 The minimum GPU VRAM requirement is 4 GB.
 
 Please run the following commands to install Conda environment and Python packages.
 ```
-conda create -n gsv python=3.10
+conda create -n gsv python=3.8
 conda activate gsv
 conda install -c nvidia/label/cuda-11.6.2 cuda-toolkit
 python -m pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu116
-python -m pip install tqdm numpy==1.24 pillow opencv-python
+python -m pip install tqdm numpy==1.24 pillow opencv-python pandas ultralytics supervision
+python -m pip install salesforce-lavis==1.0.2
 ```
+
+The first call to `BuildingProcessor.get_wallmat_vqa()` downloads the BLIP VQA model checkpoint if it is not already cached.
 
 ## Usage
 Run `python main.py --state {state_name} --building_detect --wallmat --condition --verbose`
